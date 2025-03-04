@@ -1,0 +1,515 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<base href="http://mapp.nudt.edu.cn:80/" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>国防科大·理论闯关</title>
+<meta name="description"
+	content='????'>
+<meta name="keywords"
+	content='知识库,知识管理,知识管理系统,开源知识库,开源知识管理系统,免费知识库,免费知识管理系统'>
+<meta name="author"
+	content='wcp知识管理系统'>
+<meta name="robots" content="noindex,nofllow">
+
+
+<base href="http://mapp.nudt.edu.cn:80/">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1,user-scalable=no"/>
+<link rel="icon" href="favicon.ico" mce_href="favicon.ico"
+      type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" mce_href="favicon.ico"
+      type="image/x-icon">
+<script type="text/javascript" src="text/javascript/jquery-1.8.0.min.js"></script>
+<link href="text/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="text/lib/bootstrap/css/bootstrap-theme.min.css"
+      rel="stylesheet">
+<script src="text/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="text/lib/bootstrap/respond.min.js"></script>
+<script src="text/lib/vue/vue.js"></script>
+<script src="text/lib/base.js"></script>
+<script src="https://static.alicaptcha.com/v4/ct4.js"></script>
+
+<script charset="utf-8"
+        src="http://mapp.nudt.edu.cn:80/text/lib/alert/sweetalert.min.js"></script>
+<link href="view/web-simple/atext/style/web-base.css" rel="stylesheet">
+<link href="view/web-simple/atext/style/web-black.css" rel="stylesheet">
+<link href="view/web-simple/atext/style/wts-app.css" rel="stylesheet">
+<link href="text/lib/kindeditor/editInner.css" rel="stylesheet">
+<link href="text/style/dtapp.css" rel="stylesheet">
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<script type="text/javascript">
+    var basePath = 'http://mapp.nudt.edu.cn:80/';
+    $(function () {
+        $.ajaxSetup({
+            cache: false
+        });
+    })
+
+    //ajax执行远程命令
+    function loadRemoteFunction(url, domid) {
+        $('#' + domid).attr('disabled', 'disabled');
+        $.post(url, {}, function (flag) {
+            if (flag.STATE == '0') {
+                alert("操作执行完班!");
+            } else {
+                alert(flag.MESSAGE);
+            }
+            $('#' + domid).removeAttr("disabled");
+        }, 'json');
+    }
+
+    //ajax执行远程命令
+    function loadRemoteFunctionAndReload(url, domid, mgs) {
+        if (mgs) {
+            if (confirm(mgs)) {
+                doRemoteFunctionAndReload(url, domid, mgs);
+            }
+        } else {
+            doRemoteFunctionAndReload(url, domid, mgs);
+        }
+    }
+
+    //ajax执行远程命令-do
+    function doRemoteFunctionAndReload(url, domid, mgs) {
+        $('#' + domid).attr('disabled', 'disabled');
+        $.post(url, {}, function (flag) {
+            if (flag.STATE == '0') {
+                location.reload();
+            } else {
+                alert(flag.MESSAGE);
+            }
+            $('#' + domid).removeAttr("disabled");
+        }, 'json');
+    }
+
+
+    //confirm访问后台服务
+    function confirmRemoteFunction(url, mgs) {
+        if (confirm(mgs)) {
+            window.location = basePath + url;
+        }
+    }
+
+    function pAlert(tip, timenum) {
+        if (timenum) {
+            swal({
+                text: tip,
+                timer: timenum,
+                buttons: false
+            });
+        } else {
+            swal(tip);
+        }
+    }
+
+    function pClose() {
+        setTimeout(function () {
+            swal.close();
+        }, 200);
+    }
+
+
+</script>
+</head>
+<style type="text/css">
+	.homebackground {
+		background-color: red;
+		background-image: url("text/img/homeBackgroun2.png");
+		background-size: 100%;
+		background-repeat: repeat-x;
+	}
+
+	.container_box{
+		margin-top: 100px;
+	}
+</style>
+
+<style>
+	.bgm {
+		width: 10px;
+		height: 10px;
+		opacity: 0.2;
+	}
+
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		background-color: white;
+		border-radius: 50%;
+		position: absolute;
+		top: 80px;
+		right: 10px;
+		animation: spin 2s linear infinite;
+		animation-play-state: paused; /* 初始状态暂停动画 */
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		opacity: 0.8;
+
+	}
+	.spinner img {
+		width: 70%; /* 图像宽度占圆形的70% */
+		height: auto; /* 保持图像比例 */
+	}
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+</style>
+<body class="homebackground">
+<div class="spinner" onclick="toggleAudio()">
+	<img src="/text/img/mp3ioc.png" style="width: 80%;height: 80%;">
+</div>
+<audio class="bgm" controls autoplay loop id="myAudio">
+	<source src="/text/img/bg.mp3" type="audio/mpeg">
+</audio>
+	<script type="text/javascript">
+		if (window != top) {
+			$("#loginId").html(
+					'<div style="font-size:25px;text-align:center;">'
+							+ "无法在iframe中实现登录操作，正在跳转中。。。" + '<//div>');
+			top.location.href = "login/webPage.html";
+		}
+	</script>
+
+	<div class="container_box" style="margin-top: 100px;" >
+		<div class="container ">
+			<div class="row">
+				<div class="col-sm-3"></div>
+				<div class="col-sm-6">
+					<div class=" userbox"
+						style="margin: auto; margin-top: 100px;  ">
+						<div class="panel panel-body">
+							
+
+
+
+
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="third-part tracking-ad  hidden-xs">
+                <div class="text-center">
+                    <img src="http://mapp.nudt.edu.cn:80/actionImg/PubHomelogo.do" alt="wcp"
+                         style="margin: 20px; max-width: 128px;"/>
+                    <hr/>
+                    <br/>
+                </div>
+                <!-- <span>第三方账号登录</span> <a href="qq/PubLogin.html" class="qq"></a>-->
+            </div>
+            
+            <div class="text-center" id="alertMessageErrorId"
+                 style="margin: 4px; color: white;"></div>
+        </div>
+        <div class="col-sm-7" style="padding: 26px; padding-top: 4px;">
+            <form class="form-signin" role="form" id="loginFormId"
+                  action="login/websubmitapp.do" method="post">
+                <div class="form-group">
+                        
+                </div>
+                <div class="form-group">
+
+                    <input type="hidden" id="uniqueIdentifier" name="uniqueIdentifier">
+                    <input type="hidden" id="userAgent" name="userAgent">
+                    <input type="hidden" id="screenResolution" name="screenResolution">
+                    <input type="hidden" id="screenWidth" name="screenWidth">
+                    <input type="hidden" id="timeZone" name="timeZone">
+                    <input type="hidden" id="language" name="language">
+                    <input type="hidden" id="plugins" name="plugins">
+                    <input type="hidden" id="mimeTypes" name="mimeTypes">
+                    <input type="hidden" id="webglRenderer" name="webglRenderer">
+                    <input type="hidden" name="mobile" id="mobileId">
+                    <input type="text" id="loginNameId"
+                           class="form-control dtinput" placeholder="用户登录名或手机号"
+                           value="" style="margin-top: 4px;" id="loginNameId"
+                           name="name" required autofocus>
+                </div>
+
+
+                <div class="form-group">
+                    <input
+                            type="password" class="form-control dtinput" placeholder="请输入密码"
+                            style="margin-top: 4px;" id="loginPassWId" name="password" value=""
+                            required>
+                </div>
+                
+                    
+                
+                <!-- <input type="hidden" name="url" id="loginUrlId"> -->
+                <div style="text-align: center">
+                    <button class="btn   loginbtn" id="loginButtonId"
+                            style="margin-top: 4px;" type="button">登录
+                    </button>
+                </div>
+                <div style="text-align: center">
+                    <button class="btn   loginbtn" id="PubRegistButtonId"
+                            onclick="window.location.href='webuser/PubRegist.do'"
+                            style="margin-top: 4px;" type="button">注册
+                    </button>
+                </div>
+                <div class="text-center" style="margin: 4px; ">
+                    <span class="glyphicon glyphicon-exclamation-sign"
+                          onclick="javascript:$('#exampleModalCenter').modal('show');">忘记密码?</span>
+                    <span class="glyphicon "><input id="isrememberMeId" name="isrememberMeId" type="checkbox"/>授权设备7天内免密登录</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">忘记密码</h5>
+
+            </div>
+            <div class="modal-body">
+                <span>重置密码请于工作日联系0731-87027430或906708477@qq.com</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确认</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="mianmidenglModalCenter" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">免密登录</h5>
+
+            </div>
+            <div class="modal-body">
+                <span>请保管好您的设备，防止他人盗用账号信息！</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确认</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- 用户登录后再次进入登录页面时的快捷菜单，主要为了在手机端进入用户功能 -->
+
+
+<script type="text/javascript">
+    $(function () {
+
+        var userLoginUser = localStorage.getItem('userLoginUser');
+        $("#loginNameId").val(userLoginUser);
+
+        $('#alertMessageErrorId').hide();
+        $('#loginButtonId')
+            .bind(
+                'click',
+                function () {
+                    //校验验证码
+                    if ($('#checkcodeId').length > 0 && !$('#checkcodeId').val()) {
+                        $('#alertMessageErrorId').show();
+                        $('#romovealertMessageErrorId').hide();
+                        $('#alertMessageErrorId')
+                            .html(
+                                '<span class="glyphicon glyphicon-exclamation-sign"></span>请输入验证码');
+                        return;
+                    }
+                    if ($('#loginNameId').val() && $('#loginPassWId').val()) {
+                        //$('#loginUrlId').val(document.referrer);
+                        $('#loginButtonId').addClass("disabled");
+                        $('#loginButtonId').text("提交中...");
+                        $("#mobileId").val($('#loginNameId').val());
+                        pAlert("loading...", 10000);
+                        setTimeout(function () {
+                            pAlert("网络异常，请稍后提交...", 10000);
+                        }, 5000);
+                        $('#loginFormId').submit();
+                    } else {
+                        $('#alertMessageErrorId').show();
+                        $('#romovealertMessageErrorId').hide();
+                        $('#alertMessageErrorId')
+                            .html(
+                                '<span class="glyphicon glyphicon-exclamation-sign"></span>请输入用户名/密码');
+                    }
+                });
+        $('#checkcodeimgId').bind(
+            "click",
+            function (e) {
+                $('#checkcodeimgId').attr("src",
+                    "actionImg/Pubcheckcode.do?time=" + new Date().getTime());
+            });
+        $('#loginNameId').keydown(function (e) {
+            if (e.keyCode == 13) {
+                //$('#loginUrlId').val(window.location.href);
+                $('#loginButtonId').click();
+            }
+        });
+        $('#loginPassWId').keydown(function (e) {
+            if (e.keyCode == 13) {
+                //$('#loginUrlId').val(window.location.href);
+                $('#loginButtonId').click();
+            }
+        });
+        $('#checkcodeId').keydown(function (e) {
+            if (e.keyCode == 13) {
+                //$('#loginUrlId').val(window.location.href);
+                $('#loginButtonId').click();
+            }
+        });
+
+        if ('false' != '') {
+            localStorage.setItem('passwordless', "false");
+        }
+        document.getElementById('isrememberMeId').addEventListener('change', function () {
+            const isPasswordless = this.checked;
+            if (isPasswordless) {
+                $('#mianmidenglModalCenter').modal('show');
+            }
+            localStorage.setItem('passwordless', isPasswordless + "");
+        });
+
+
+        generateDeviceFingerprint();
+
+        aotoLogin();
+    });
+
+
+    function setaotologinflag() {
+
+    }
+
+    function generateDeviceFingerprint() {
+        // 获取浏览器User-Agent字符串
+        const userAgent = navigator.userAgent || '';
+
+        // 获取屏幕分辨率
+        const screenWidth = screen.width || 0;
+        const screenHeight = screen.height || 0;
+        const screenResolution = `${screenWidth}x${screenHeight}`;
+        $("#screenWidth").val(screenWidth);
+
+        // 获取时区
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+
+        // 获取语言偏好
+        const language = navigator.language || navigator.userLanguage || 'Unknown';
+
+        // 获取插件列表（可能为空）
+        const plugins = Array.from(navigator.plugins || []).map(plugin => plugin.name).join(',');
+
+        // 获取Mime类型列表（可能为空）
+        const mimeTypes = Array.from(navigator.mimeTypes || []).map(mimeType => mimeType.type).join(',');
+
+        // 使用WebGL渲染器信息（如果可用）
+        let webglRenderer = '';
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl && gl.getExtension('WEBGL_debug_renderer_info')) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                webglRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+            }
+        } catch (e) {
+        }
+
+
+        document.getElementById('userAgent').value = userAgent;
+        document.getElementById('screenResolution').value = screenResolution;
+        document.getElementById('timeZone').value = timeZone;
+        document.getElementById('language').value = language;
+        document.getElementById('plugins').value = plugins;
+        document.getElementById('mimeTypes').value = mimeTypes;
+        document.getElementById('webglRenderer').value = webglRenderer;
+        document.getElementById('uniqueIdentifier').value = localStorage.getItem('uniqueIdentifier');
+
+
+        const passwordless = localStorage.getItem('passwordless') === 'true';
+        $("#isrememberMeId").attr("checked", passwordless);
+    }
+
+
+    function aotoLogin() {
+        const passwordless = localStorage.getItem('passwordless') === 'true';
+
+        if (passwordless) {
+            pAlert("正在免密登录...", 10000);
+            $('#loginFormId').submit();
+            $("#isrememberMeId").attr("checked", true);
+        } else {
+            $("#isrememberMeId").attr("checked", false);
+        }
+    }
+
+
+    //-->
+</script>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-3"></div>
+			</div>
+		</div>
+	</div>
+	
+	<div style="width:100%">
+		<img  class="footimg" style="width:100%" src="/text/img/bag2.png" />
+		
+	</div>
+
+<script>
+	// 获取音频元素和旋转圆形元素
+	const audio = document.getElementById('myAudio');
+	const spinner = document.querySelector('.spinner');
+
+	// 监听音频播放和暂停事件
+	audio.addEventListener('play', () => {
+		spinner.style.animationPlayState = 'running'; // 开始动画
+	});
+
+	audio.addEventListener('pause', () => {
+		spinner.style.animationPlayState = 'paused'; // 暂停动画
+	});
+	// 监听用户首次点击页面
+	document.addEventListener('click', function() {
+		audio.play();
+	}, { once: true }); // 仅执行一次
+
+	// 控制音频播放和暂停的函数
+	function toggleAudio() {
+		if (audio.paused) {
+			audio.play();
+			spinner.style.animationPlayState = 'running'; // 开始动画
+		} else {
+			audio.pause();
+			spinner.style.animationPlayState = 'paused'; // 暂停动画
+		}
+	}
+</script>
+
+</body>
+</html>
