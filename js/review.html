@@ -1,0 +1,2084 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <base href="http://mapp.nudt.edu.cn:80/"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>国防科大·理论闯关 </title>
+    <meta name="description"
+          content='????'>
+    <meta name="keywords"
+          content='知识库,知识管理,知识管理系统,开源知识库,开源知识管理系统,免费知识库,免费知识管理系统'>
+    <meta name="author"
+          content='wcp知识管理系统'>
+    <meta name="robots" content="index,follow">
+    
+
+<base href="http://mapp.nudt.edu.cn:80/">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1,user-scalable=no"/>
+<link rel="icon" href="favicon.ico" mce_href="favicon.ico"
+      type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" mce_href="favicon.ico"
+      type="image/x-icon">
+<script type="text/javascript" src="text/javascript/jquery-1.8.0.min.js"></script>
+<link href="text/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="text/lib/bootstrap/css/bootstrap-theme.min.css"
+      rel="stylesheet">
+<script src="text/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="text/lib/bootstrap/respond.min.js"></script>
+<script charset="utf-8"
+        src="http://mapp.nudt.edu.cn:80/text/lib/alert/sweetalert.min.js"></script>
+<link href="view/web-simple/atext/style/web-base.css" rel="stylesheet">
+<link href="view/web-simple/atext/style/web-black.css" rel="stylesheet">
+<link href="view/web-simple/atext/style/wts-app.css" rel="stylesheet">
+<link href="text/lib/kindeditor/editInner-mobile.css" rel="stylesheet">
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<link href="text/style/dtapp.css" rel="stylesheet">
+
+<script type="text/javascript">
+    var basePath = 'http://mapp.nudt.edu.cn:80/';
+    $(function () {
+        $.ajaxSetup({
+            cache: false
+        });
+    })
+
+    //ajax执行远程命令
+    function loadRemoteFunction(url, domid) {
+        $('#' + domid).attr('disabled', 'disabled');
+        $.post(url, {}, function (flag) {
+            if (flag.STATE == '0') {
+                alert("操作执行完班!");
+            } else {
+                alert(flag.MESSAGE);
+            }
+            $('#' + domid).removeAttr("disabled");
+        }, 'json');
+    }
+
+    //ajax执行远程命令
+    function loadRemoteFunctionAndReload(url, domid, mgs) {
+        if (mgs) {
+            if (confirm(mgs)) {
+                doRemoteFunctionAndReload(url, domid, mgs);
+            }
+        } else {
+            doRemoteFunctionAndReload(url, domid, mgs);
+        }
+    }
+
+    //ajax执行远程命令-do
+    function doRemoteFunctionAndReload(url, domid, mgs) {
+        $('#' + domid).attr('disabled', 'disabled');
+        $.post(url, {}, function (flag) {
+            if (flag.STATE == '0') {
+                location.reload();
+            } else {
+                alert(flag.MESSAGE);
+            }
+            $('#' + domid).removeAttr("disabled");
+        }, 'json');
+    }
+
+
+    //confirm访问后台服务
+    function confirmRemoteFunction(url, mgs) {
+        if (confirm(mgs)) {
+            window.location = basePath + url;
+        }
+    }
+
+    function pAlert(tip, timenum) {
+        if (timenum) {
+            swal({
+                text: tip,
+                timer: timenum,
+                buttons: false
+            });
+        } else {
+            swal(tip);
+        }
+    }
+
+    function pClose() {
+        setTimeout(function () {
+            swal.close();
+        }, 200);
+    }
+    function appFormatDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = ((now.getMonth() + 1) + "").padStart(2, '0'); // Months are zero-based
+        const day = (now.getDate() + "").padStart(2, '0');
+
+        return year + "-" + month + "-" + day;
+    }
+
+
+
+</script>
+    <link href="view/web-mobile/subject/text/mobile-card.css"
+          rel="stylesheet">
+    <script charset="utf-8"
+            src="http://mapp.nudt.edu.cn:80/text/lib/alert/sweetalert.min.js"></script>
+
+</head>
+<style>
+    .subjectBox {
+        text-align: left;
+    }
+
+    .firework {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: url('/text/img/huahua.png') no-repeat center center;
+        background-size: contain;
+        opacity: 0;
+        animation: explode 2s ease-out forwards;
+    }
+
+    @keyframes explode {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+
+    .dtbox2 {
+
+
+        margin-top: 50%;
+        text-align: center;
+        background-color: #fff;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .warnTimeTip {
+        float: right;
+        z-index: 906;
+        position: fixed;
+        top: 150px;
+        right: 3px;
+        border: 1px dashed #cccccc;
+        border-radius: 6px;
+        background-color: #ffffef;
+        cursor: pointer;
+    }
+
+    #fireworksCanvas {
+        position: absolute;
+        top: 100px;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 906;
+    }
+
+    .fireworksPer {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+
+        overflow: hidden;
+        position: absolute;
+        top: 100px;
+        left: 0;
+        z-index: 906;
+    }
+
+
+    .floating-gif {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .left {
+        left: 10px;
+    }
+
+    .right {
+        right: 10px;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(-50%) translateX(0);
+        }
+        50% {
+            transform: translateY(-60%) translateX(10px);
+        }
+    }
+
+    .answerRightViewBox {
+        font-size: 14px;
+        border: 1px dashed;
+        line-height: 26px;
+        background-color: #dff0d8;
+        border-radius: 6px;
+        padding: 6px;
+        margin-bottom: 6px;
+        text-align: left;
+    }
+
+    .wts-select-unit:HOVER {
+        color: black;
+    }
+
+</style>
+<body class="homebackground">
+<canvas id="fireworksCanvas" style="display:none;"></canvas>
+<div class="fireworksPer" id="fireworksPer" style="display:none;"></div>
+
+
+<!-- /.carousel -->
+<div class=" dtbox2" style="min-height: 200px;">
+    <!-- 首页--分类考场2 -->
+    <div>
+        <div class="row"
+             style="background-color: #ffffff; border-bottom: 1px solid #cccccc;">
+            <div class="container" style="padding: 8px;">
+                <div>
+                    <div style="overflow: hidden;">
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="min-height: 200px;">
+            <div class="container wts-paper-forms" style="padding: 0px;">
+
+                <!-- 题目展示区 -->
+                
+                    <div style="margin-bottom: 18px; padding: 20px; background-color: #ffffff; border-bottom: 1px dashed #ccc;">
+                        <h3 style="text-align: center;">
+                            <img alt="" src="text/img/complete.png"
+                                 style="width: 2em; height: 2em; position: relative; top: -5px;">
+                            已经完成全部&nbsp;10&nbsp;题&nbsp;&nbsp; <br/>
+
+                            <span style="color: green;">正确:</span>&nbsp;/&nbsp;<span
+                                style="color: red;">错误:</span>
+
+
+                            
+                                /共获得2积分&nbsp;
+                                
+                            
+                            
+                                
+                        </h3>
+                    </div>
+                
+                <!-- 错题学习模式 -->
+                
+                
+                    <div>
+
+                        <div id="8a94964793b4bd630193b8812789332d-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第1题&nbsp; 判断题&nbsp;
+                                
+                                    回答正确
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--判断题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">1</div>
+        <div>
+            
+                <div style="text-align: left;">
+
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/a4df545e1acf4a1b933de236b80202a4.jpg" style="width: 100%">
+                        
+                        
+                    
+
+
+                        
+                        
+                </div>
+                
+                <div style="margin: 8px;"></div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+
+                        
+                            <li><label style="cursor: pointer;">
+                                    对 <input id="8a94964793b4bd630193b8812789332e-INPUT"
+                                                                 style="cursor: pointer;" type="radio"
+                                                                 name="8a94964793b4bd630193b8812789332d"
+                                                                 disabled="disabled"
+                                checked="checked"
+                                                                 value="8a94964793b4bd630193b8812789332e">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;">
+                                    错 <input id="8a94964793b4bd630193b8812789332f-INPUT"
+                                                                 style="cursor: pointer;" type="radio"
+                                                                 name="8a94964793b4bd630193b8812789332d"
+                                                                 disabled="disabled"
+                                
+                                                                 value="8a94964793b4bd630193b8812789332f">
+                            </label></li>
+                        
+
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a94964793b4bd630193b8812789332c"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a94964793b4bd630193b8812789332e-INPUT">正确选项：对
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a94964794f6cbae0194fab42450063e-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第2题&nbsp; 单选题&nbsp;
+                                
+                                    回答正确
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--单选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">2</div>
+        <div>
+            
+                <div style="text-align: left;">
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/7df53901e9684c8189dd234de78808b8.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                    
+                </div>
+            
+
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A
+                                <input
+                                        id="8a94964794f6cbae0194fab4245e063f-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a94964794f6cbae0194fab42450063e"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a94964794f6cbae0194fab4245e063f">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B
+                                <input
+                                        id="8a94964794f6cbae0194fab4245e0640-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a94964794f6cbae0194fab42450063e"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a94964794f6cbae0194fab4245e0640">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C
+                                <input
+                                        id="8a94964794f6cbae0194fab4245e0641-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a94964794f6cbae0194fab42450063e"
+
+                                        disabled="disabled"
+
+                                    checked="checked"
+                                        value="8a94964794f6cbae0194fab4245e0641">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D
+                                <input
+                                        id="8a94964794f6cbae0194fab4245e0642-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a94964794f6cbae0194fab42450063e"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a94964794f6cbae0194fab4245e0642">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a94964794f6cbae0194fab42450063d"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a94964794f6cbae0194fab4245e0641-INPUT">正确选项：
+								C.生态环境保护
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a949647944173dc019449c3ab487337-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第3题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">3</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/29198647729a488ab73d9cb3f47b60a0.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a949647944173dc019449c3ab537338-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647944173dc019449c3ab487337" value="8a949647944173dc019449c3ab537338">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a949647944173dc019449c3ab537339-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647944173dc019449c3ab487337" value="8a949647944173dc019449c3ab537339">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a949647944173dc019449c3ab53733a-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647944173dc019449c3ab487337" value="8a949647944173dc019449c3ab53733a">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a949647944173dc019449c3ab53733b-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647944173dc019449c3ab487337" value="8a949647944173dc019449c3ab53733b">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a949647944173dc019449c3ab477336"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647944173dc019449c3ab537338-INPUT">正确选项：
+								A.具体化
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647944173dc019449c3ab537339-INPUT">正确选项：
+								B.精准化
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647944173dc019449c3ab53733a-INPUT">正确选项：
+								C.常态化
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a9496479329dd41019329fc00c001b0-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第4题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">4</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/ae73aa7f09084c459f8b327fa08ab421.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                    <div class="ke-content ke-content-borderbox">
+                        
+
+                    </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a9496479329dd41019329fc00cf01b1-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a9496479329dd41019329fc00c001b0" value="8a9496479329dd41019329fc00cf01b1">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a9496479329dd41019329fc00cf01b2-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a9496479329dd41019329fc00c001b0" value="8a9496479329dd41019329fc00cf01b2">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a9496479329dd41019329fc00cf01b3-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a9496479329dd41019329fc00c001b0" value="8a9496479329dd41019329fc00cf01b3">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a9496479329dd41019329fc00cf01b4-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a9496479329dd41019329fc00c001b0" value="8a9496479329dd41019329fc00cf01b4">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a9496479329dd41019329fc00c001af"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a9496479329dd41019329fc00cf01b1-INPUT">正确选项：
+								A.教育改革发展
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a9496479329dd41019329fc00cf01b2-INPUT">正确选项：
+								B.科技创新
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a9496479329dd41019329fc00cf01b3-INPUT">正确选项：
+								C.人才培养
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a949647941b76bd019426a28c18672d-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第5题&nbsp; 单选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--单选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">5</div>
+        <div>
+            
+                <div style="text-align: left;">
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/b8fe971b1c6c457f8e56248977346b8f.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                    
+                </div>
+            
+
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A
+                                <input
+                                        id="8a949647941b76bd019426a28c24672e-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a949647941b76bd019426a28c18672d"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a949647941b76bd019426a28c24672e">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B
+                                <input
+                                        id="8a949647941b76bd019426a28c24672f-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a949647941b76bd019426a28c18672d"
+
+                                        disabled="disabled"
+
+                                    checked="checked"
+                                        value="8a949647941b76bd019426a28c24672f">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C
+                                <input
+                                        id="8a949647941b76bd019426a28c246730-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a949647941b76bd019426a28c18672d"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a949647941b76bd019426a28c246730">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D
+                                <input
+                                        id="8a949647941b76bd019426a28c246731-INPUT" style="cursor: pointer;"
+                                        type="radio" name="8a949647941b76bd019426a28c18672d"
+
+                                        disabled="disabled"
+
+                                    
+                                        value="8a949647941b76bd019426a28c246731">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a949647941b76bd019426a28c18672c"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647941b76bd019426a28c24672e-INPUT">正确选项：
+								A.政治修养
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a949647941b76bd019426a28be2670f-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第6题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">6</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/0ab0daf0cba44b9dba746f2cf96cd774.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a949647941b76bd019426a28beb6710-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647941b76bd019426a28be2670f" value="8a949647941b76bd019426a28beb6710">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a949647941b76bd019426a28beb6711-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647941b76bd019426a28be2670f" value="8a949647941b76bd019426a28beb6711">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a949647941b76bd019426a28beb6712-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647941b76bd019426a28be2670f" value="8a949647941b76bd019426a28beb6712">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a949647941b76bd019426a28beb6713-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647941b76bd019426a28be2670f" value="8a949647941b76bd019426a28beb6713">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a949647941b76bd019426a28be2670e"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647941b76bd019426a28beb6710-INPUT">正确选项：
+								A.历史传统
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647941b76bd019426a28beb6711-INPUT">正确选项：
+								B.社会制度
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647941b76bd019426a28beb6712-INPUT">正确选项：
+								C.发展条件
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647941b76bd019426a28beb6713-INPUT">正确选项：
+								D.外部环境
+						</label>
+					</div>
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a94964793b4bd630193b88126b032fd-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第7题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">7</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/e27570205f624cc3bafb1ba0207c5132.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a94964793b4bd630193b88126c232fe-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a94964793b4bd630193b88126b032fd" value="8a94964793b4bd630193b88126c232fe">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a94964793b4bd630193b88126c332ff-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a94964793b4bd630193b88126b032fd" value="8a94964793b4bd630193b88126c332ff">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a94964793b4bd630193b88126c33300-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a94964793b4bd630193b88126b032fd" value="8a94964793b4bd630193b88126c33300">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a94964793b4bd630193b88126c33301-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a94964793b4bd630193b88126b032fd" value="8a94964793b4bd630193b88126c33301">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a94964793b4bd630193b88126b032fc"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a94964793b4bd630193b88126c232fe-INPUT">正确选项：
+								A.和平力量
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a94964793b4bd630193b88126c33300-INPUT">正确选项：
+								C.发展力量
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a94964793b4bd630193b88126c33301-INPUT">正确选项：
+								D.进步力量
+						</label>
+					</div>
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a80908692fba4450192ff4e461d009f-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第8题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">8</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/a049f738a395466584ab6bf4da18108b.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                    <div class="ke-content ke-content-borderbox">
+                        
+
+                    </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a80908692fba4450192ff4e700300a1-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a80908692fba4450192ff4e461d009f" value="8a80908692fba4450192ff4e700300a1">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a80908692fba4450192ff4e967100a2-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a80908692fba4450192ff4e461d009f" value="8a80908692fba4450192ff4e967100a2">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a80908692fba4450192ff4ebe0a00a3-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a80908692fba4450192ff4e461d009f" value="8a80908692fba4450192ff4ebe0a00a3">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a80908692fba4450192ff4ede4200a4-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a80908692fba4450192ff4e461d009f" value="8a80908692fba4450192ff4ede4200a4">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a80908692fba4450192ff4e461d009e"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a80908692fba4450192ff4e700300a1-INPUT">正确选项：
+								A.社会救助
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a80908692fba4450192ff4e967100a2-INPUT">正确选项：
+								B.社会福利
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a80908692fba4450192ff4ebe0a00a3-INPUT">正确选项：
+								C.社会事务
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a80908692fba4450192ff4ede4200a4-INPUT">正确选项：
+								D.社会治理
+						</label>
+					</div>
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a80908692fba4450192ff5e4bb200f2-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第9题&nbsp; 填空题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--填空题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">9</div>
+        <div>
+            
+                <div style="text-align: left;">
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/7961e7020fd843a0852de65e02d9160a.jpg" style="width: 100%">
+                        
+                        
+                    
+
+
+                        
+                </div>
+                
+                    <div class="ke-content ke-content-borderbox">
+                        
+
+                    </div>
+                
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerVacancyViewBox">
+                    <div class="row" style="padding-top: 8px;">
+
+                        
+                            <div class="col-md-6">
+                                <div class="form-group has-warning has-feedback">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">第1空答案：</span>
+                                        <input type="text" name="8a80908692fba4450192ff5e4bb200f2"
+                                               id="8a80908692fba4450192ff5e853500f4-INPUT" class="form-control"
+                                               disabled="disabled"
+                                               value="很久很久">
+                                    </div>
+                                </div>
+                            </div>
+                        
+                    </div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a80908692fba4450192ff5e4bb100f1"
+		style="height: auto;">
+		
+			
+				<!-- 填空题正确答案 -->
+				<div>
+					<label for="8a80908692fba4450192ff5e853500f4-INPUT">第1空，正确答案：一国两制</label>
+					
+						<label style="color: #666; font-size: 14px; font-weight: 200;">&nbsp;(得分权重:1)</label>
+					
+				</div>
+			
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+                            
+                            
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+                    <div>
+
+                        <div id="8a949647951ba0d701951d85f49c05b8-NAVI">
+                            <div class="side_unit_info"
+                                 style="font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.2em;">
+                                第10题&nbsp; 多选题&nbsp;
+                                
+                                    回答错误
+                                
+
+                                
+
+
+                            </div>
+                            <!-- 一级章节下的题目 1.填空，2.单选，3.多选，4判断，5问答-->
+                            
+                            
+                            
+                                
+
+
+
+<link rel="stylesheet" type="text/css"
+      href="http://mapp.nudt.edu.cn:80/view/exam/subject/subject.css">
+<!--多选题 flag=(adjudge:判卷，answer：答卷，checkup：检查)-->
+
+<div>
+    <div class="subjectUnitViewBox">
+        <div class="subjectOrder">10</div>
+        <div>
+            
+                <!-- 阅卷時不显示 题目-->
+                <div style="text-align: left;">
+                        
+
+                    
+                        
+                            <img src="/text/answer_img/20250304/028fbc456ee14ad48410147a6764e1be.jpg" style="width: 100%">
+                        
+                        
+                    
+
+                        
+                </div>
+                
+                <div class="subjectBox" style="margin: 8px;">
+                    
+                </div>
+            
+            
+                <!-- 用户答题和预览时显示，填写答案 -->
+                <div class="answerUnitViewBox">
+                    <ul>
+                        
+                            <li><label style="cursor: pointer;"> A &nbsp;
+                                <input
+                                        id="8a949647951ba0d701951d85f4ad05b9-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647951ba0d701951d85f49c05b8" value="8a949647951ba0d701951d85f4ad05b9">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> B &nbsp;
+                                <input
+                                        id="8a949647951ba0d701951d85f4ad05ba-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647951ba0d701951d85f49c05b8" value="8a949647951ba0d701951d85f4ad05ba">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> C &nbsp;
+                                <input
+                                        id="8a949647951ba0d701951d85f4ad05bb-INPUT"
+                                    checked="checked"
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647951ba0d701951d85f49c05b8" value="8a949647951ba0d701951d85f4ad05bb">
+                            </label></li>
+                        
+                            <li><label style="cursor: pointer;"> D &nbsp;
+                                <input
+                                        id="8a949647951ba0d701951d85f4ae05bc-INPUT"
+                                    
+                                        style="cursor: pointer;" type="checkbox"
+
+                                        disabled="disabled"
+
+                                        name="8a949647951ba0d701951d85f49c05b8" value="8a949647951ba0d701951d85f4ae05bc">
+                            </label></li>
+                        
+                    </ul>
+                    <div style="clear: both;"></div>
+                </div>
+            
+            
+            
+
+
+
+<!-- 显示答案，显示分数 -->
+
+
+	<!-- 阅卷時顯示标准答案-->
+	<div class="answerRightViewBox" subjectId="8a949647951ba0d701951d85f49c05b7"
+		style="height: auto;">
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647951ba0d701951d85f4ad05b9-INPUT">正确选项：
+								A.爱国爱家
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647951ba0d701951d85f4ad05ba-INPUT">正确选项：
+								B.相亲相爱
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647951ba0d701951d85f4ad05bb-INPUT">正确选项：
+								C.向上向善
+						</label>
+					</div>
+				
+			
+			
+			
+		
+			
+			
+				<!-- 判断题/单选题/多选题正确答案 -->
+				
+					<div>
+						<label for="8a949647951ba0d701951d85f4ae05bc-INPUT">正确选项：
+								D.共建共享
+						</label>
+					</div>
+				
+			
+			
+			
+		
+	</div>
+
+
+        </div>
+    </div>
+</div>
+                            
+                            
+                            
+                            
+                        </div>
+                    </div>
+
+                
+
+
+            </div>
+        </div>
+        <div class="row"
+             style="background-color: #ffffff; border-top: 1px solid #cccccc;border-bottom: 1px solid #cccccc;">
+            <div class="container">
+                <div style="padding-top: 20px; padding-bottom: 20px; text-align: center;">
+
+
+                    
+                        <a type="button" class="btn" style="margin-left: 5px"
+                           href="javaScript:tohomePage()"> 返回首页
+                        </a>
+
+                    
+                    
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 题评论-->
+<div class="modal fade" id="submitComments-win" tabindex="-1"
+     role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+						<span class="glyphicon glyphicon-star column_title">&nbsp;最新评论
+						</span>
+                </h4>
+            </div>
+            <div id="analysisBoxId" class="modal-body"
+                 style="padding: 0px; padding-bottom: 50px;">
+                <div id="commentShowBoxId"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 加油弹窗-->
+
+
+
+
+
+
+<style>
+
+
+    .footimg {
+
+        width: 100%;
+
+    }
+
+
+</style>
+<div class="appcard">
+
+
+    <img class="footimg" src="/text/img/foot_img.png"/>
+    
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(window).resize(function () {
+            $('.containerbox').css('min-height', $(window).height() - 170);
+        });
+        $('.containerbox').css('min-height', $(window).height() - 170);
+    });
+</script>
+
+
+</body>
+<script src="view/web-simple/subject/text/random.js"></script>
+<script type="text/javascript">
+
+    //练习题目
+    function subjectsTest(ids) {
+        window.location = "http://mapp.nudt.edu.cn:80/websubject/PubSubject.do?subjectType=pubOwnSubject&subjectids=" + ids;
+    }
+
+
+    // 向历史记录栈添加一个新的条目
+    history.pushState(null, null, '/home/index.do');
+    window.addEventListener('popstate', function (event) {
+        // 当用户尝试返回时，再次添加一个新的历史记录条目
+        history.pushState(null, null, '/home/index.do');
+    });
+
+    function tohomePage() {
+
+
+        //老大哥要公众号点击量，本程序员也是无力，各位看官多担待
+        var tohomeFlag = localStorage.getItem('tohomePage');
+
+        var day = appFormatDate();
+
+        if (tohomeFlag == day) {
+            window.location.href = '/home/index.do'
+        } else {
+            localStorage.setItem('tohomePage', day);
+            window.location.href = 'https://mp.weixin.qq.com/s/hQC4QK4FKxh609-gVnHNag'
+        }
+    }
+
+
+
+</script>
+</html>
