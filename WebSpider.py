@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import json
 import time
 from urllib.parse import urlencode
+import random
 
 
 class Web:
@@ -17,13 +18,19 @@ class Web:
         self.headers = {
             "User-Agent": "Mozilla/5.0+(Linux;+Android+10;+ELE-AL00+Build/HUAWEIELE-AL00;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/78.0.3904.62+XWEB/2691+MMWEBSDK/200901+Mobile+Safari/537.36+MMWEBID/215+MicroMessenger/7.0.19.1760(0x2700133F)+Process/toolsmp+WeChat/arm64+NetType/WIFI+Language/zh_CN+ABI/arm64"
         }
+        self.f = open('log.txt', 'a', encoding='utf-8')
     
+    def log(self, text):
+        try:
+            formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            self.f.write(f"[{formatted_time}] {text}\n")
+        except:
+            raise Warning('log error')
+        return 0
+
     def login(self, username, password):
-        headers = {
-            "User-Agent": "Mozilla/5.0+(Linux;+Android+10;+ELE-AL00+Build/HUAWEIELE-AL00;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/78.0.3904.62+XWEB/2691+MMWEBSDK/200901+Mobile+Safari/537.36+MMWEBID/215+MicroMessenger/7.0.19.1760(0x2700133F)+Process/toolsmp+WeChat/arm64+NetType/WIFI+Language/zh_CN+ABI/arm64"
-        }
         url = 'http://mapp.nudt.edu.cn/login/webout.do'
-        be = requests.get(url, headers=headers)
+        be = requests.get(url, headers=self.headers)
         cookie = be.cookies
         cookie = cookie.items()
         cookie = dict(cookie)
@@ -46,6 +53,7 @@ class Web:
         if response.status_code == 200:
             self.cookie = cookie
             print('Login successfully.')
+            self.log('Login successfully.')
         else:
             raise Exception("Login failed.")
         
@@ -62,6 +70,8 @@ class Web:
         roomid = match.groups()[1]
         self.roomid = roomid
         self.subjectType = type
+        self.log(f"Room ID: {self.roomid}, Subject Type: {self.subjectType}")
+        print(f"Room ID: {self.roomid}, Subject Type: {self.subjectType}")
 
     def get_roompage(self):
         url = 'http://mapp.nudt.edu.cn/exam/roompage.do'
@@ -75,6 +85,7 @@ class Web:
         url = soup.find('a', id='topic_start_btn').get('href')
         paperid = re.findall('paperid=(.*?)&', url)[0]
         self.paperid = paperid
+        self.log(f"Paper ID: {self.paperid}")
 
     def get_testid(self):
         url = 'http://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
@@ -91,6 +102,7 @@ class Web:
         self.versionId = re.findall(r'var versionId = "(.*?)";', html)[0]
         self.subjectId = re.findall(r'var subjectId = "(.*?)";', html)[0]
         self.loginUserId = re.findall(r"'loginUserId': '(.*?)',", html)[0]
+        self.log(f"Test ID: {self.testid}, Version ID: {self.versionId}, Subject ID: {self.subjectId}, Login User ID: {self.loginUserId}")
         return self.testid
         
     def analyze_question(self, html):
@@ -177,6 +189,7 @@ class Web:
                     right_ans.append(label.get('for').replace('-INPUT', ''))
                     #print(label.get('for').replace('-INPUT', ''))
                 print(right_ans)
+            self.log(f"Question {ind}: {q_type}, Choices: {choices}, Right Answers: {right_ans}")
             qs.append((ind, q_type, choices, right_ans))
         return qs
     
@@ -225,6 +238,7 @@ class Web:
             response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
         if response.status_code == 200:
             print(response.text)
+            self.log(response.text)
             print('Submit successfully.')
             return 0
         
@@ -247,32 +261,49 @@ class Web:
             try:
                 jf = re.findall('共获得(.*?)积分', html)[0]
                 print("共获得%"+str(jf)+"积分")
+                self.log("共获得%"+str(jf)+"积分")
             except:
                 print(html)
             return jf
         else:
             print('Get VersionID')
             return True
+    def close(self):
+        self.log('Finish')
+        self.f.close()
+        return 'Finish'
 
+def relu(n):
+    if n <= 0:
+        return 0
+    return n
 
 if __name__ == '__main__':
     web = Web()
     #web.login('ttest', '954321')
-    web.cookie = {'JSESSIONID': '9218E87364A8D217155D740D2C1B93A1'}
+    web.cookie = {'JSESSIONID': 'F66082434E4D5737324A9A1CF60565E2'}
     web.get_roomid()
-    t1 = time.time()
+    t11 = time.time()
     web.get_roompage()
     testid = web.get_testid()
     html = web.get_review()
     qs = web.get_ans(html)
     i = 0
+    ut = 1.5
     for q in qs:
+        r = random.random()-.5
+        time.sleep(relu(2-ut+r))
+        t1 = time.time()
         i += 1
         print(i)
-        time.sleep(0.6)
+        
         web.submit_ans(q[2], q[3], q[1])
+        t2 = time.time()
+        ut = t2-t1
         web.get_result(i+1)
         #print()
-    t2 = time.time()
-    print(t2-t1)
+    t22 = time.time()
+    print(f'TimeUsed: {t22-t11}')
+    web.log(f'TimeUsed: {t22-t11}')
+    web.close()
     #print(web.get_result())
