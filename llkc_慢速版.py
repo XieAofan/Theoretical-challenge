@@ -344,9 +344,7 @@ class Web:
         try:
             response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
         except:
-            while response.status_code != 200:
-                self.log(response.text)
-                response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
+            response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
         if response.status_code == 200:
             print(response.text)
             self.log(response.text)
@@ -454,7 +452,7 @@ def finish_v2(web):
             if tn-ts < 20:
                 print("Waiting...")
                 tn = time.time()
-                time.sleep(20-(tn-ts)-.2)
+                time.sleep(60)
         tes = time.time()
         t1 = time.time()
         web.get_result(i+1)
@@ -466,6 +464,7 @@ def finish_v2(web):
     web.log(f'SleepedTimeUsed: {tes-ts}')
     print(f'TimeUsed: {te-ts}')
     web.log(f'TimeUsed: {te-ts}')
+3
 
 
 def run():
