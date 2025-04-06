@@ -1,0 +1,7 @@
+dist/
+js/
+INstaller/
+__pycache__/
+.idea/
+build/
+.venv/
