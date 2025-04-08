@@ -396,79 +396,100 @@ class Web:
         self.f.close()
         return 'Finish'
 
-def finish(web):
-    web.get_roomid()
-    t11 = time.time()
-    web.get_roompage()
-    testid = web.get_testid()
-    html = web.get_review()
-    qs = web.get_ans(html)
-    i = 0
-    ut = 1.5
-    for q in qs:
-        r = random.random()-.5
-        time.sleep(1.72-ut+r*0.8)
-        t1 = time.time()
-        i += 1
-        print(i)
+
+class main:
+    def __init__(self):
+        self.setting = {}
+
+    # 读取配置文件
+    def read_setting(self):
+        data = json.dumps(self.setting)
+        with open("setting.json", "r") as f:
+            rd = f.read()
+        self.setting = json.loads(rd)
+        return True
+
+    # 保存配置文件
+    def save_setting(self):
+        data = json.dumps(self.setting)
+        with open("setting.json", "w+") as f:
+            f.write(data)
+        return True
+
+    def finish(self, web):
+        web.get_roomid()
+        t11 = time.time()
+        web.get_roompage()
+        testid = web.get_testid()
+        html = web.get_review()
+        qs = web.get_ans(html)
+        i = 0
+        ut = 1.5
+        for q in qs:
+            r = random.random()-.5
+            time.sleep(1.72-ut+r*0.8)
+            t1 = time.time()
+            i += 1
+            print(i)
+            
+            web.submit_ans(q[2], q[3], q[1])
+            t2 = time.time()
+            ut = t2-t1
+            if i == 10:
+                t33 = time.time()
+                if t33-t11 < 20:
+                    time.sleep(20-(t33-t11)+0.1)
+                else:
+                    time.sleep(0.1)
+            web.get_result(i+1)
+            #print()
+        t22 = time.time()
+        print(f'TimeUsed: {t22-t11}')
+        web.log(f'TimeUsed: {t22-t11}')
         
-        web.submit_ans(q[2], q[3], q[1])
-        t2 = time.time()
-        ut = t2-t1
-        if i == 10:
-            t33 = time.time()
-            if t33-t11 < 20:
-                time.sleep(20-(t33-t11)+0.1)
-            else:
-                time.sleep(0.1)
-        web.get_result(i+1)
-        #print()
-    t22 = time.time()
-    print(f'TimeUsed: {t22-t11}')
-    web.log(f'TimeUsed: {t22-t11}')
-    
-    #print(web.get_result())
+        #print(web.get_result())
 
 
-def finish_v2(web):
-    web.get_roomid()
-    web.get_roompage()
-    result_times = []
+    def finish_v2(self, web):
+        web.get_roomid()
+        web.get_roompage()
+        result_times = []
 
-    ts = time.time()
-    testid = web.get_testid()
-    html = web.get_review()
-    qs = web.get_ans(html)
-    i = 0
-    ut = 1.5
-    for q in qs:
-        # 随机时间
-        r = random.random()-.5
-        time.sleep(0.5 + r*0.3)
-        t1 = time.time()
-        i += 1
-        print(f"{i}/10")
-        web.submit_ans(q[2], q[3], q[1])
-        tn = time.time()
-        if i == 10:
-            if tn-ts < 20:
-                print("Waiting...")
-                tn = time.time()
-                time.sleep(20-(tn-ts)-.2)
-        tes = time.time()
-        t1 = time.time()
-        web.get_result(i+1)
-        t2 = time.time()
-        result_times.append(t2 - t1)
-        #print()
-    te = time.time()
-    print(f'SleepedTimeUsed: {tes-ts}')
-    web.log(f'SleepedTimeUsed: {tes-ts}')
-    print(f'TimeUsed: {te-ts}')
-    web.log(f'TimeUsed: {te-ts}')
+        ts = time.time()
+        testid = web.get_testid()
+        html = web.get_review()
+        qs = web.get_ans(html)
+        i = 0
+        ut = 1.5
+        for q in qs:
+            # 随机时间
+            r = random.random()-.5
+            time.sleep(0.5 + r*0.3)
+            t1 = time.time()
+            i += 1
+            print(f"{i}/10")
+            web.submit_ans(q[2], q[3], q[1])
+            tn = time.time()
+            if i == 10:
+                if tn-ts < 20:
+                    print("Waiting...")
+                    tn = time.time()
+                    time.sleep(20-(tn-ts)-.15)
+            tes = time.time()
+            t1 = time.time()
+            web.get_result(i+1)
+            t2 = time.time()
+            result_times.append(t2 - t1)
+            #print()
+        te = time.time()
+        print(f'SleepedTimeUsed: {tes-ts}')
+        web.log(f'SleepedTimeUsed: {tes-ts}')
+        print(f'TimeUsed: {te-ts}')
+        web.log(f'TimeUsed: {te-ts}')
 
 
 def run():
+    m = main()
     web = Web()
 
     # 处理Cookie
@@ -502,7 +523,7 @@ def run():
     while t < 2:
         # a = input("Press Enter to continue...")
         try:
-            finish_v2(web)
+            m.finish_v2(web)
         except MyCustomError as e:
             print(e)
             web.log(e)
