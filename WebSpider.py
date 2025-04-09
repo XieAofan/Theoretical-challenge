@@ -6,35 +6,42 @@ import time
 from urllib.parse import urlencode
 import random
 import os
+import pandas as pd
 
-class MyCustomError(Exception):
+class SubTimeError(Exception):
+    """答题时间异常"""
+    def __init__(self, message="答题时间异常"):
+        super().__init__(message)
+
+class SubAnswerError(Exception):
     """自定义异常类"""
-    def __init__(self, message="这是一个自定义异常"):
+    def __init__(self, message="上报异常异常"):
         super().__init__(message)
 
 
-def savehtml(html):
-    local_appdata = os.environ.get('LOCALAPPDATA')
-    app_folder = os.path.join(local_appdata, "XieAofan", "zddt", "html.html")
-    try:
-        with open(app_folder, 'w', encoding='utf-8') as f:
-            f.write(html)
-    except:
-        raise Warning('html error')
+# def savehtml(html):
+#     local_appdata = os.environ.get('LOCALAPPDATA')
+#     app_folder = os.path.join(local_appdata, "XieAofan", "zddt", "html.html")
+#     try:
+#         with open(app_folder, 'w', encoding='utf-8') as f:
+#             f.write(html)
+#     except:
+#         raise Warning('html error')
     
 
 class Web:
-    def __init__(self):
+    def __init__(self, data_dir, username=None, password=None):
         self.cookie = None
         self.roomid = None
         self.paperid = None
         self.get_username = None
-        self.username = None
+        self.username = username
+        self.password = password
         self.versionId = 1
         self.testid = 1
         self.loginUserId = 1
-        local_appdata = os.environ.get('LOCALAPPDATA')
-        app_folder = os.path.join(local_appdata, "XieAofan", "zddt")
+        
+        app_folder = data_dir
         # 如果目录不存在，则创建
         if not os.path.exists(app_folder):
             os.makedirs(app_folder)
@@ -53,8 +60,7 @@ class Web:
                 with open(path, 'r', encoding='utf-8') as f:
                     d = json.load(f)
                     self.cookie = d['cookie']
-                    self.username = d['username']
-                    self.password = d['password']
+                    
             except:
                 f = open(path, 'w', encoding='utf-8')
                 self.cookie = {'JSESSIONID': 'XXXXXXXXXXXXXXXXXXXXXXX'}
@@ -64,8 +70,6 @@ class Web:
     def save_cookie(self, path='cookie.json'):
         path = os.path.join(self.app_folder, path)
         d = {
-            "username":self.username,
-            "password":self.password,
             "cookie":self.cookie,
         }
         try:
@@ -87,7 +91,6 @@ class Web:
         url = 'http://mapp.nudt.edu.cn/home/index.do'
         be = requests.get(url, headers=self.headers, cookies=self.cookie)
         text = be.text
-        savehtml(text)
         pattern = r'<div class="userinfo">\s*(\w+)\s*欢迎回来\s*</div>'
         match = re.search(pattern, text)
 
@@ -104,6 +107,7 @@ class Web:
             return True
         else:
             print("未找到用户名")
+            # raise Warning('login error')
         return False
     
     def login(self, username, password):
@@ -140,7 +144,6 @@ class Web:
         url = 'http://mapp.nudt.edu.cn/login/websubmitapp.do'
         response = requests.post(url, data=post_data, cookies=cookie, headers=self.headers)
         # print(response.status_code)
-        savehtml(response.text)
         if response.cookies.items() != []:
             cookie = response.cookies
             cookie = cookie.items()
@@ -159,7 +162,7 @@ class Web:
         url = 'http://mapp.nudt.edu.cn/home/answerRoom.do'
         response = requests.get(url, cookies=self.cookie, headers=self.headers)
         text = response.text
-        savehtml(text)
+
         soup = BeautifulSoup(text, 'html.parser')
         button = soup.find('button', class_='loginbtn')
         # text2 = button.get('onclick')
@@ -243,7 +246,6 @@ class Web:
             divs.append(div)
         # '\n                                第1题\xa0 多选题\xa0\n\n\n\n\n\n                            '
         type_list = ['填空', '单选', '多选', '判断', '问答']
-        savehtml(html)
 
         qs = []
         for div in divs:
@@ -341,19 +343,20 @@ class Web:
             'Connection': 'keep-alive',
             'Content-Type': 'application/x-www-form-urlencoded'
             }
-        try:
+        response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
+        while response.status_code != 200:
+            self.log(response.text)
             response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
-        except:
-            while response.status_code != 200:
-                self.log(response.text)
-                response = requests.post(url, data=encoded_data, headers=headers, cookies=self.cookie)
         if response.status_code == 200:
             print(response.text)
             self.log(response.text)
             if response.text != '{"OPERATE":3,"STATE":0,"point":100}':
-                raise Exception("Submit failed.")
+                raise SubAnswerError("Submit failed.")
             print('Submit successfully.')
             return 0
+        else:
+            print(response.text)
+            raise SubAnswerError("Submit failed.")
         
     def get_result(self, id = 11):
         url = 'http://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
@@ -373,7 +376,7 @@ class Web:
             if "本次答题时间异常，不记录成绩，请重新答题！" in html:
                 print("本次答题时间异常，不记录成绩，请重新答题！")
                 self.log("本次答题时间异常，不记录成绩，请重新答题！")
-                raise MyCustomError("Time error")
+                raise SubTimeError("Time error")
 
             print(html)
         if id == 11:
@@ -381,11 +384,12 @@ class Web:
                 jf = re.findall('共获得(.*?)积分', html)[0]
                 print("共获得"+str(jf)+"积分")
                 self.log("共获得"+str(jf)+"积分")
+                self.jf = jf[1:]
                 return jf[1:]
             except:
-                savehtml(html)
                 if "正确:10" in html:
                     print("今日得分上限")
+                    raise Exception("今日得分上限")
                     return True
                 return False
         else:
@@ -396,10 +400,12 @@ class Web:
         self.f.close()
         return 'Finish'
 
-
 class main:
     def __init__(self):
+        local_appdata = os.environ.get('LOCALAPPDATA')
         self.setting = {}
+        self.df = pd.DataFrame(columns=['TimeUsed', 'Score'])
+        self.read_setting()
 
     # 读取配置文件
     def read_setting(self):
@@ -449,8 +455,8 @@ class main:
         
         #print(web.get_result())
 
-
-    def finish_v2(self, web):
+    def finish_v2(self, web, t):
+        web.jf = 'Error'
         web.get_roomid()
         web.get_roompage()
         result_times = []
@@ -474,7 +480,7 @@ class main:
                 if tn-ts < 20:
                     print("Waiting...")
                     tn = time.time()
-                    time.sleep(20-(tn-ts)-.15)
+                    time.sleep(t-(tn-ts)-.1)
             tes = time.time()
             t1 = time.time()
             web.get_result(i+1)
@@ -486,17 +492,52 @@ class main:
         web.log(f'SleepedTimeUsed: {tes-ts}')
         print(f'TimeUsed: {te-ts}')
         web.log(f'TimeUsed: {te-ts}')
+        new_row = pd.DataFrame({'Time':[time.strftime("%Y-%m-%d", time.localtime())], 'userName':[web.username], 'TimeUsed': [te-ts], 'Score': [web.jf]})
+        self.df = pd.concat([self.df, new_row], ignore_index=True)
+        # self.df = self.df.append({'Time':time.strftime("%Y-%m-%d", time.localtime()), 'userName':web.username, 'TimeUsed': te-ts, 'Score': web.jf}, ignore_index=True)
 
+    def run(self, username, password):
+        dir = os.path.join(os.getcwd(), 'data', username)
+        web = Web(dir, username, password)
+        web.get_cookie()
+        print(f"Now Cookie is {web.cookie['JSESSIONID']}")
+        web.log(f"Now Cookie is {web.cookie['JSESSIONID']}")
+        print(f"当前用户名{web.username}")
 
+        if web.is_login() == False:
+            web.login(username, password)
+            web.is_login()
+        web.save_cookie()
+        t=0
+        while t < 2:
+            # a = input("Press Enter to continue...")
+            try:
+                self.finish_v2(web)
+            except SubTimeError as e:
+                print(e)
+                web.log(e)
+                continue
+            except Exception as e:
+                print(e)
+                web.log(e)
+                break
+            time.sleep(1)
+            t += 1
+        # finish(web)
+        # web.save_cookie()
+        web.close()
+    def close(self):
+        self.save_setting()
+        self.df.to_csv('results.csv', index=False)
 def run():
     m = main()
     web = Web()
 
     # 处理Cookie
     web.get_cookie()
-    print(f"Now Cookie is {web.cookie["JSESSIONID"]}")
+    print(f"Now Cookie is {web.cookie['JSESSIONID']}")
     print(f"当前用户名{web.username}")
-    web.log(f"Now Cookie is {web.cookie["JSESSIONID"]}")
+    web.log(f"Now Cookie is {web.cookie['JSESSIONID']}")
     new_cookie = input("Input Y to relogin or Press Enter to pass: ")
     # 处理登陆
     if new_cookie in ['Y', 'y']:
@@ -524,7 +565,7 @@ def run():
         # a = input("Press Enter to continue...")
         try:
             m.finish_v2(web)
-        except MyCustomError as e:
+        except SubTimeError as e:
             print(e)
             web.log(e)
             continue
@@ -536,4 +577,11 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    m = main()
+    for u in m.setting['userList']:
+        try:
+            if u['status']:
+                m.run(u['userName'], u['password'])
+        except Exception as e:
+            print(e)
+    m.close()
