@@ -455,7 +455,7 @@ class main:
         
         #print(web.get_result())
 
-    def finish_v2(self, web, t):
+    def finish_v2(self, web, t=20):
         web.jf = 'Error'
         web.get_roomid()
         web.get_roompage()
@@ -496,7 +496,7 @@ class main:
         self.df = pd.concat([self.df, new_row], ignore_index=True)
         # self.df = self.df.append({'Time':time.strftime("%Y-%m-%d", time.localtime()), 'userName':web.username, 'TimeUsed': te-ts, 'Score': web.jf}, ignore_index=True)
 
-    def run(self, username, password):
+    def run(self, username, password, t):
         dir = os.path.join(os.getcwd(), 'data', username)
         web = Web(dir, username, password)
         web.get_cookie()
@@ -512,7 +512,7 @@ class main:
         while t < 2:
             # a = input("Press Enter to continue...")
             try:
-                self.finish_v2(web)
+                self.finish_v2(web, t)
             except SubTimeError as e:
                 print(e)
                 web.log(e)
@@ -581,6 +581,8 @@ if __name__ == '__main__':
     for u in m.setting['userList']:
         try:
             if u['status']:
+                if 'TimeLimit' in u:
+                    m.run(u['userName'], u['password'], u['TimeLimit'])
                 m.run(u['userName'], u['password'])
         except Exception as e:
             print(e)
