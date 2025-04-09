@@ -384,8 +384,8 @@ class Web:
                 jf = re.findall('共获得(.*?)积分', html)[0]
                 print("共获得"+str(jf)+"积分")
                 self.log("共获得"+str(jf)+"积分")
-                self.jf = jf[1:]
-                return jf[1:]
+                self.jf = jf
+                return jf
             except:
                 if "正确:10" in html:
                     print("今日得分上限")
@@ -404,7 +404,7 @@ class main:
     def __init__(self):
         local_appdata = os.environ.get('LOCALAPPDATA')
         self.setting = {}
-        self.df = pd.DataFrame(columns=['TimeUsed', 'Score'])
+        self.df = pd.DataFrame(columns=['TimeUsed', 'Score', 'Time', 'userName'])
         self.read_setting()
 
     # 读取配置文件
@@ -455,7 +455,7 @@ class main:
         
         #print(web.get_result())
 
-    def finish_v2(self, web, t=20):
+    def finish_v2(self, web, wt=20):
         web.jf = 'Error'
         web.get_roomid()
         web.get_roompage()
@@ -480,7 +480,7 @@ class main:
                 if tn-ts < 20:
                     print("Waiting...")
                     tn = time.time()
-                    time.sleep(t-(tn-ts)-.1)
+                    time.sleep(wt-(tn-ts)-.1)
             tes = time.time()
             t1 = time.time()
             web.get_result(i+1)
@@ -492,11 +492,12 @@ class main:
         web.log(f'SleepedTimeUsed: {tes-ts}')
         print(f'TimeUsed: {te-ts}')
         web.log(f'TimeUsed: {te-ts}')
+
         new_row = pd.DataFrame({'Time':[time.strftime("%Y-%m-%d", time.localtime())], 'userName':[web.username], 'TimeUsed': [te-ts], 'Score': [web.jf]})
         self.df = pd.concat([self.df, new_row], ignore_index=True)
         # self.df = self.df.append({'Time':time.strftime("%Y-%m-%d", time.localtime()), 'userName':web.username, 'TimeUsed': te-ts, 'Score': web.jf}, ignore_index=True)
 
-    def run(self, username, password, t):
+    def run(self, username, password, wt=20):
         dir = os.path.join(os.getcwd(), 'data', username)
         web = Web(dir, username, password)
         web.get_cookie()
@@ -512,7 +513,7 @@ class main:
         while t < 2:
             # a = input("Press Enter to continue...")
             try:
-                self.finish_v2(web, t)
+                self.finish_v2(web, wt)
             except SubTimeError as e:
                 print(e)
                 web.log(e)
@@ -527,7 +528,7 @@ class main:
         # web.save_cookie()
         web.close()
     def close(self):
-        self.save_setting()
+        # self.save_setting()
         self.df.to_csv('results.csv', index=False)
 def run():
     m = main()
