@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse/papaparse.min.js"></script>
+    <style>
+        canvas {
+            max-width: 100%;
+            display: block; /* 确保canvas元素上下排列 */
+            margin: 0 auto; /* 居中显示 */
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Visualization</h1>
+    <div style="display: flex; flex-direction: column; align-items: center;"> <!-- 修改为上下排列 -->
+        <canvas id="scoreChart" width="700" height="400"></canvas>
+        <canvas id="timeUsedChart" width="700" height="400"></canvas>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 读取 CSV 文件
+            Papa.parse('results.csv', {
+                download: true,
+                header: true,
+                complete: function (results) {
+                    const data = results.data;
+
+                    // 按 userName 和 Time 分组，并对 Score 和 TimeUsed 进行求和
+                    const grouped = data.reduce((acc, row) => {
+                        const key = `${row.Time}-${row.userName}`;
+                        if (!acc[key]) {
+                            acc[key] = { Time: row.Time, userName: row.userName, Score: 0, TimeUsed: 0 };
+                        }
+                        acc[key].Score += parseFloat(row.Score);
+                        acc[key].TimeUsed += parseFloat(row.TimeUsed);
+                        return acc;
+                    }, {});
+
+                    const groupedArray = Object.values(grouped);
+
+                    // 获取当前日期
+                    const currentDate = new Date().toISOString().split('T')[0];
+
+                    // 创建 Score 图表
+                    const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+                    const scoreChart = new Chart(scoreCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: groupedArray.map(item => item.userName),
+                            datasets: [{
+                                label: `Cumulative Score on ${groupedArray[0].Time} (Generated on ${currentDate})`,
+                                data: groupedArray.map(item => item.Score),
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed !== null) {
+                                                label += context.parsed;
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                },
+                                datalabels: { // 添加数据标签插件
+                                    anchor: 'end',
+                                    align: 'top',
+                                    formatter: function(value) {
+                                        return value;
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // 创建 TimeUsed 图表
+                    const timeUsedCtx = document.getElementById('timeUsedChart').getContext('2d');
+                    const timeUsedChart = new Chart(timeUsedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: groupedArray.map(item => item.userName),
+                            datasets: [{
+                                label: `Cumulative Time Used on ${groupedArray[0].Time} (Generated on ${currentDate})`,
+                                data: groupedArray.map(item => item.TimeUsed.toFixed(2)),
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed !== null) {
+                                                label += context.parsed + ' seconds';
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                },
+                                datalabels: { // 添加数据标签插件
+                                    anchor: 'end',
+                                    align: 'top',
+                                    formatter: function(value) {
+                                        return value + ' seconds';
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
