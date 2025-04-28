@@ -1,8 +1,9 @@
 import requests, time
 from lxml import etree
 from fake_useragent import UserAgent
+from pypinyin import lazy_pinyin
 
-url = "https://alhs.xyz/index.php/archives/2022/12/49443/"
+url = "https://alhs.xyz/index.php/archives/2020/09/2536/"
 
 
 ua = UserAgent()
@@ -17,7 +18,7 @@ headers = {
 }
 
 
-response = requests.get('https://alhs.xyz/index.php/archives/2022/12/49443/', headers=headers, proxies=proxies)
+response = requests.get(url, headers=headers, proxies=proxies)
 
 
 # 解析 HTML
@@ -37,7 +38,19 @@ for li in li_elements[1:]:
     url = a[0].get('href')
     url_list.append([url, text])
 
+
 # print(url_list)
+url_list = sorted(url_list, key=lambda x: (
+    # 提取年、月、末尾数字（根据URL结构调整索引位置）
+    int(x[0].split('/')[-4]),  # 年
+    int(x[0].split('/')[-3]),  # 月
+    int(x[0].split('/')[-2])   # 末尾数字
+))
+# print(url_list)
+
+# 在排序后添加去重逻辑（保留顺序）
+seen_urls = set()
+url_list = [x for x in url_list if not (x[0] in seen_urls or seen_urls.add(x[0]))]
 
 def get_text(tree):
     text = ''
