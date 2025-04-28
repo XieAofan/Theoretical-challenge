@@ -6,7 +6,7 @@ import time
 from urllib.parse import urlencode
 import random
 import os
-import pandas as pd
+# import pandas as pd
 import DBControl
 
 class SubTimeError(Exception):
@@ -20,18 +20,8 @@ class SubAnswerError(Exception):
         super().__init__(message)
 
 
-# def savehtml(html):
-#     local_appdata = os.environ.get('LOCALAPPDATA')
-#     app_folder = os.path.join(local_appdata, "XieAofan", "zddt", "html.html")
-#     try:
-#         with open(app_folder, 'w', encoding='utf-8') as f:
-#             f.write(html)
-#     except:
-#         raise Warning('html error')
-    
-
 class Web:
-    def __init__(self, data_dir, username=None, password=None):
+    def __init__(self, data_dir, db, username=None, password=None):
         self.cookie = None
         self.roomid = None
         self.paperid = None
@@ -41,7 +31,7 @@ class Web:
         self.versionId = 1
         self.testid = 1
         self.loginUserId = 1
-        self.db = DBControl.DB()
+        self.db = db
         self.db.init()
         
         app_folder = data_dir
@@ -403,160 +393,7 @@ class Web:
         self.f.close()
         return 'Finish'
 
-class main:
-    def __init__(self):
-        local_appdata = os.environ.get('LOCALAPPDATA')
-        self.setting = {}
-        # self.df = pd.DataFrame(columns=['TimeUsed', 'Score', 'Time', 'userName'])
-        self.read_setting()
-
-    # 读取配置文件
-    def read_setting(self):
-        data = json.dumps(self.setting)
-        with open("setting.json", "r") as f:
-            rd = f.read()
-        self.setting = json.loads(rd)
-        return True
-
-    # 保存配置文件
-    def save_setting(self):
-        data = json.dumps(self.setting)
-        with open("setting.json", "w+") as f:
-            f.write(data)
-        return True
-
-
-    def finish_v2(self, web, wt=20):
-        web.jf = 'Error'
-        web.get_roomid()
-        web.get_roompage()
-        result_times = []
-
-        ts = time.time()
-        testid = web.get_testid()
-        html = web.get_review()
-        qs = web.get_ans(html)
-        i = 0
-        ut = 1.5
-        for q in qs:
-            # 随机时间
-            r = random.random()-.5
-            time.sleep(0.5 + r*0.3)
-            t1 = time.time()
-            i += 1
-            print(f"{i}/10")
-            web.submit_ans(q[2], q[3], q[1])
-            tn = time.time()
-            if i == 10:
-                if tn-ts < 20:
-                    print("Waiting...")
-                    tn = time.time()
-                    time.sleep(wt-(tn-ts)-.1)
-            tes = time.time()
-            t1 = time.time()
-            web.get_result(i+1)
-            t2 = time.time()
-            result_times.append(t2 - t1)
-            #print()
-        te = time.time()
-        print(f'SleepedTimeUsed: {tes-ts}')
-        web.log(f'SleepedTimeUsed: {tes-ts}')
-        print(f'TimeUsed: {te-ts}')
-        web.log(f'TimeUsed: {te-ts}')
-        web.db.add(username=web.username, duration=te-ts, score=web.jf)
-        # new_row = pd.DataFrame({'Time':[time.strftime("%Y-%m-%d", time.localtime())], 'userName':[web.username], 'TimeUsed': [te-ts], 'Score': [web.jf]})
-        # self.df = pd.concat([self.df, new_row], ignore_index=True)
-        # self.df = self.df.append({'Time':time.strftime("%Y-%m-%d", time.localtime()), 'userName':web.username, 'TimeUsed': te-ts, 'Score': web.jf}, ignore_index=True)
-
-    def run(self, username, password, wt=20):
-        dir = os.path.join(os.getcwd(), 'data', username)
-        web = Web(dir, username, password)
-        web.get_cookie()
-        print(f"Now Cookie is {web.cookie['JSESSIONID']}")
-        web.log(f"Now Cookie is {web.cookie['JSESSIONID']}")
-        print(f"当前用户名{web.username}")
-
-        if web.is_login() == False:
-            web.login(username, password)
-            web.is_login()
-        web.save_cookie()
-        t=0
-        while t < 2:
-            # a = input("Press Enter to continue...")
-            try:
-                self.finish_v2(web, wt)
-            except SubTimeError as e:
-                print(e)
-                web.log(e)
-                continue
-            except Exception as e:
-                print(e)
-                web.log(e)
-                break
-            time.sleep(1)
-            t += 1
-        # finish(web)
-        # web.save_cookie()
-        web.close()
-    def close(self):
-        # self.save_setting()
-        # self.df.to_csv('results.csv', index=False)
-        pass
-def run():
-    m = main()
-    web = Web()
-
-    # 处理Cookie
-    web.get_cookie()
-    print(f"Now Cookie is {web.cookie['JSESSIONID']}")
-    print(f"当前用户名{web.username}")
-    web.log(f"Now Cookie is {web.cookie['JSESSIONID']}")
-    new_cookie = input("Input Y to relogin or Press Enter to pass: ")
-    # 处理登陆
-    if new_cookie in ['Y', 'y']:
-        username = input("Input username: ")
-        password = input("Input password: ")
-        web.username = username
-        web.password = password
-    username = web.username
-    password = web.password
-    if web.is_login() == False:
-        web.login(username, password)
-        web.is_login()
-            
-    
-    web.save_cookie()
-    
-    
-    try:
-        web.get_roomid()
-    except:
-        pass
-
-    t=0
-    while t < 2:
-        # a = input("Press Enter to continue...")
-        try:
-            m.finish_v2(web)
-        except SubTimeError as e:
-            print(e)
-            web.log(e)
-            continue
-        time.sleep(1)
-        t += 1
-    #finish(web)
-    web.save_cookie()
-    web.close()
 
 
 if __name__ == '__main__':
-    m = main()
-    for u in m.setting['userList']:
-        try:
-            if u['status']:
-                if 'TimeLimit' in u:
-                    m.run(u['userName'], u['password'], u['TimeLimit'])
-                m.run(u['userName'], u['password'])
-        except Exception as e:
-            print(e)
-    m.close()
+    pass

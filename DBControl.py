@@ -1,5 +1,6 @@
 import sqlite3
 import time, json
+from datetime import datetime
 
 class DB:
     def __init__(self):
@@ -10,7 +11,7 @@ class DB:
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS question(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            time INTEGER,
+            time TEXT,
             username TEXT,
             duration INTEGER,
             score REAL
@@ -21,22 +22,39 @@ class DB:
     def add(self, username:str, duration:float, score:int):
         self.cursor.execute('''
         INSERT INTO question(time, username, duration, score) VALUES(?, ?, ?, ?)
-        ''', (int(time.time()), username, duration, score))
+        ''', (self.timestamp_to_date(time.time()), username, duration, score))
         self.conn.commit()
 
-    def get_question(self, type:str):
+    def get_question(self, time=''):
         '''
-        type: str, 题目类型
+        time: str, 题目类型
         username: str, 用户名
         duration: int, 用时
         score: float, 得分
         '''
+        if time != '':
+            self.cursor.execute('''
+            SELECT * FROM question WHERE time=?
+            ''', (time,))
+            result = self.cursor.fetchall()
+            return result
+        
         self.cursor.execute('''
         SELECT * FROM question
         ''')
         result = self.cursor.fetchall()
         return result
     
+    # 新增函数：将时间戳转换为日期
+    def timestamp_to_date(self, timestamp: int) -> str:
+        """
+        将时间戳转换为日期字符串。
+        
+        :param timestamp: 时间戳（整数）
+        :return: 日期字符串，格式为 "YYYY-MM-DD HH:MM:SS"
+        """
+        return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
+
 if __name__ == '__main__':
     db = DB()
     db.init()
