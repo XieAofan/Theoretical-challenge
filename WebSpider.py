@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 import random
 import os
 import pandas as pd
+import DBControl
 
 class SubTimeError(Exception):
     """答题时间异常"""
@@ -40,6 +41,8 @@ class Web:
         self.versionId = 1
         self.testid = 1
         self.loginUserId = 1
+        self.db = DBControl.DB()
+        self.db.init()
         
         app_folder = data_dir
         # 如果目录不存在，则创建
@@ -404,7 +407,7 @@ class main:
     def __init__(self):
         local_appdata = os.environ.get('LOCALAPPDATA')
         self.setting = {}
-        self.df = pd.DataFrame(columns=['TimeUsed', 'Score', 'Time', 'userName'])
+        # self.df = pd.DataFrame(columns=['TimeUsed', 'Score', 'Time', 'userName'])
         self.read_setting()
 
     # 读取配置文件
@@ -460,9 +463,9 @@ class main:
         web.log(f'SleepedTimeUsed: {tes-ts}')
         print(f'TimeUsed: {te-ts}')
         web.log(f'TimeUsed: {te-ts}')
-
-        new_row = pd.DataFrame({'Time':[time.strftime("%Y-%m-%d", time.localtime())], 'userName':[web.username], 'TimeUsed': [te-ts], 'Score': [web.jf]})
-        self.df = pd.concat([self.df, new_row], ignore_index=True)
+        web.db.add(username=web.username, duration=te-ts, score=web.jf)
+        # new_row = pd.DataFrame({'Time':[time.strftime("%Y-%m-%d", time.localtime())], 'userName':[web.username], 'TimeUsed': [te-ts], 'Score': [web.jf]})
+        # self.df = pd.concat([self.df, new_row], ignore_index=True)
         # self.df = self.df.append({'Time':time.strftime("%Y-%m-%d", time.localtime()), 'userName':web.username, 'TimeUsed': te-ts, 'Score': web.jf}, ignore_index=True)
 
     def run(self, username, password, wt=20):
@@ -497,7 +500,8 @@ class main:
         web.close()
     def close(self):
         # self.save_setting()
-        self.df.to_csv('results.csv', index=False)
+        # self.df.to_csv('results.csv', index=False)
+        pass
 def run():
     m = main()
     web = Web()

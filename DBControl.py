@@ -11,41 +11,32 @@ class DB:
         CREATE TABLE IF NOT EXISTS question(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             time INTEGER,
-            type TEXT,
-            question TEXT,
-            choice TEXT,
-            answer TEXT
+            username TEXT,
+            duration INTEGER,
+            score REAL
         )
         ''')
         self.conn.commit()
 
-    def add_question(self, type:str, question:list, choice:list, answer:list):
-        '''
-        type: str, 题目类型
-        question: list, 题目
-        choice: list, 选项
-        answer: list, 答案
-        '''
-        question = json.dumps(question)
-        choice = json.dumps(choice)
-        answer = json.dumps(answer)
+    def add(self, username:str, duration:float, score:int):
         self.cursor.execute('''
-        INSERT INTO question(time, type, question, choice, answer) VALUES(?, ?, ?, ?, ?)
-        ''', (int(time.time()), type, question, choice, answer))
+        INSERT INTO question(time, username, duration, score) VALUES(?, ?, ?, ?)
+        ''', (int(time.time()), username, duration, score))
         self.conn.commit()
 
     def get_question(self, type:str):
         '''
         type: str, 题目类型
+        username: str, 用户名
+        duration: int, 用时
+        score: float, 得分
         '''
         self.cursor.execute('''
-        SELECT * FROM question WHERE type=?
-        ''', (type,))
+        SELECT * FROM question
+        ''')
         result = self.cursor.fetchall()
         return result
     
 if __name__ == '__main__':
     db = DB()
     db.init()
-    db.add_question('mc', ['1+1=?'], ['1', '2', '3', '4'], [1, 'B'])
-    print(db.get_question('mc'))
