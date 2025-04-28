@@ -372,6 +372,7 @@ class Web:
                 raise SubTimeError("Time error")
 
             print(html)
+        
         if id == 11:
             try:
                 jf = re.findall('共获得(.*?)积分', html)[0]

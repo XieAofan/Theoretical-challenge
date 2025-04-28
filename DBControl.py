@@ -54,6 +54,8 @@ class DB:
         :return: 日期字符串，格式为 "YYYY-MM-DD HH:MM:SS"
         """
         return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
+    def close(self):
+        self.conn.close()
 
 if __name__ == '__main__':
     db = DB()
