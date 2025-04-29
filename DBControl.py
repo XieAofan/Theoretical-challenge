@@ -51,7 +51,7 @@ class DB:
         将时间戳转换为日期字符串。
         
         :param timestamp: 时间戳（整数）
-        :return: 日期字符串，格式为 "YYYY-MM-DD HH:MM:SS"
+        :return: 日期字符串，格式为 "YYYY-MM-DD"
         """
         return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d")
     def close(self):

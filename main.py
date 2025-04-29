@@ -16,13 +16,13 @@ def check_condition(priority, db:DBControl.DB):
         return False
     
     for i in result:
-        if i[3] > 20 or i[4] < 10:
+        if i[3] >= 21 or i[4] < 10:
             return False
     return True
 
 # 生成报告函数
 def gen_report(db:DBControl.DB):
-    text = db.timestamp_to_date(time.time())
+    text = db.timestamp_to_date(time.time()) + '\n'
     result = db.get_question(time=db.timestamp_to_date(time.time()))
     for i in result:
         text = text + f"{i[2]}\t{i[3]}\t{i[4]}\n"
@@ -83,11 +83,13 @@ if __name__ == '__main__':
         # 检查状态
         if not user_setting['status']:
             print("用户状态为关闭，跳过该用户")
+            
             continue
 
         # 检查条件是否满足
         if not check_condition(user_setting['priority'], db):
             print("条件不满足，跳过该用户")
+            message = f"用户{user_setting['userName']}运行出错，条件不满足"
             continue
         
         # 答题逻辑

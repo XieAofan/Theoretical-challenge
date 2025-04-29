@@ -22,7 +22,7 @@ def run_user(username, password, db:DBControl.DB, wt=20):
     web.save_cookie()
 
     # 答题逻辑
-    times = 1  # 定义答题计数
+    times = 0  # 定义答题计数
     while times < 2:
         
         # a = input("Press Enter to continue...")
