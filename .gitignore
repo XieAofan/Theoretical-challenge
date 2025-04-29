@@ -9,4 +9,5 @@ WebSpider.spec
 results.csv
 setting.json
 data/
+data.db
 
