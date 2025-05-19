@@ -3,7 +3,7 @@ from lxml import etree
 from fake_useragent import UserAgent
 from pypinyin import lazy_pinyin
 
-url = "https://alhs.xyz/index.php/archives/2020/09/2536/"
+url = "https://alhs.xyz/index.php/archives/2022/09/45233/"
 
 
 ua = UserAgent()

@@ -40,7 +40,7 @@ class Web:
             os.makedirs(app_folder)
         self.app_folder = app_folder
         self.headers = {
-            "User-Agent": "Mozilla/5.0+(Linux;+Android+10;+ELE-AL00+Build/HUAWEIELE-AL00;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/78.0.3904.62+XWEB/2691+MMWEBSDK/200901+Mobile+Safari/537.36+MMWEBID/215+MicroMessenger/7.0.19.1760(0x2700133F)+Process/toolsmp+WeChat/arm64+NetType/WIFI+Language/zh_CN+ABI/arm64"
+            "User-Agent": "Mozilla/5.0 (Linux; Android 7.1.1; MI 6 Build/NMF26X; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 MQQBrowser/6.2 TBS/043807 Mobile Safari/537.36 MicroMessenger/6.6.1.1220(0x26060135) NetType/4G Language/zh_CN"
         }
         path = os.path.join(self.app_folder, 'log.txt')
         self.f = open(path, 'a', encoding='utf-8')
@@ -81,7 +81,7 @@ class Web:
         return 0
 
     def is_login(self):
-        url = 'http://mapp.nudt.edu.cn/home/index.do'
+        url = 'https://mapp.nudt.edu.cn/home/index.do'
         be = requests.get(url, headers=self.headers, cookies=self.cookie)
         text = be.text
         pattern = r'<div class="userinfo">\s*(\w+)\s*欢迎回来\s*</div>'
@@ -108,7 +108,7 @@ class Web:
             return True
         self.username = username
         self.password = password
-        url = 'http://mapp.nudt.edu.cn/login/webPage.do'
+        url = 'https://mapp.nudt.edu.cn/home/index.do'
         be = requests.get(url, headers=self.headers, cookies=self.cookie)
 
         cookie = be.cookies
@@ -121,8 +121,8 @@ class Web:
             self.cookie = cookie
         
         post_data = {
-            'uniqueIdentifier': '87bc417ebee29ea52e6cc4bd8d0baec1',
-            'userAgent': 'Mozilla/5.0+(Linux;+Android+10;+ELE-AL00+Build/HUAWEIELE-AL00;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/78.0.3904.62+XWEB/2691+MMWEBSDK/200901+Mobile+Safari/537.36+MMWEBID/215+MicroMessenger/7.0.19.1760(0x2700133F)+Process/toolsmp+WeChat/arm64+NetType/WIFI+Language/zh_CN+ABI/arm64',
+            'uniqueIdentifier': None,
+            'userAgent': 'Mozilla/5.0 (Linux; Android 7.1.1; MI 6 Build/NMF26X; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 MQQBrowser/6.2 TBS/043807 Mobile Safari/537.36 MicroMessenger/6.6.1.1220(0x26060135) NetType/4G Language/zh_CN',
             'screenResolution':'390x844',
             'screenWidth':'390',
             'mobile':username,
@@ -131,10 +131,12 @@ class Web:
             'isrememberMeId': 'on',
             'timeZone': 'Asia/Hong_Kong',
             'language': 'zh_CN',
-            'webglRenderer': 'ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)'
+            'webglRenderer': 'ANGLE (Intel, Intel(R) Arc(TM) Graphics (0x00007D55) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+            'plugins': None,
+            'mimeTypes': None,
         }
 
-        url = 'http://mapp.nudt.edu.cn/login/websubmitapp.do'
+        url = 'https://mapp.nudt.edu.cn/login/websubmitapp.do'
         response = requests.post(url, data=post_data, cookies=cookie, headers=self.headers)
         # print(response.status_code)
         if response.cookies.items() != []:
@@ -152,7 +154,7 @@ class Web:
             raise Exception("Login failed.")
         
     def get_roomid(self):
-        url = 'http://mapp.nudt.edu.cn/home/answerRoom.do'
+        url = 'https://mapp.nudt.edu.cn/home/answerRoom.do'
         response = requests.get(url, cookies=self.cookie, headers=self.headers)
         text = response.text
 
@@ -169,7 +171,7 @@ class Web:
         print(f"Room ID: {self.roomid}, Subject Type: {self.subjectType}")
 
     def get_roompage(self):
-        url = 'http://mapp.nudt.edu.cn/exam/roompage.do'
+        url = 'https://mapp.nudt.edu.cn/exam/roompage.do'
         param = {
             'roomid': self.roomid,
             'subjectType': self.subjectType
@@ -183,7 +185,7 @@ class Web:
         self.log(f"Paper ID: {self.paperid}")
 
     def get_testid(self):
-        url = 'http://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
+        url = 'https://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
         param = {
             'roomid': self.roomid,
             'subjectType': self.subjectType,
@@ -218,7 +220,7 @@ class Web:
         return ind, q_type, q_img_url, choices
     
     def get_review(self):
-        url = 'http://mapp.nudt.edu.cn/websubject/testCardSubjectReview.do'
+        url = 'https://mapp.nudt.edu.cn/websubject/testCardSubjectReview.do'
         param = {
             'testid': self.testid,
         }
@@ -298,7 +300,7 @@ class Web:
         return qs
     
     def submit_ans(self, choices, right_ans, qtype):
-        url = 'http://mapp.nudt.edu.cn/websubject/PubRunPoint.do'
+        url = 'https://mapp.nudt.edu.cn/websubject/PubRunPoint.do'
         val = []
         for i, choice in enumerate(choices):
             
@@ -352,7 +354,7 @@ class Web:
             raise SubAnswerError("Submit failed.")
         
     def get_result(self, id = 11):
-        url = 'http://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
+        url = 'https://mapp.nudt.edu.cn/websubject/PubRandomSubject.do'
         param = {
             'index':id,
             'totalTime': 0,

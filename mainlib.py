@@ -52,7 +52,7 @@ def answer_question(web:WebSpider.Web, wt=20):
     i = 0
     for q in question_List:
         i += 1
-        time.sleep(1)
+        time.sleep(0.5)
         print(f"{i}/10")
         web.submit_ans(q[2], q[3], q[1])
         tn = time.time()
