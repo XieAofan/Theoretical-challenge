@@ -71,7 +71,7 @@ if __name__ == '__main__':
     message = '运行成功'
 
     # 读取配置文件
-    with open("setting.json", "r") as f:
+    with open("setting.json", "r", encoding="utf-8") as f:
         rd = f.read()
     setting_list = json.loads(rd)
     
@@ -107,13 +107,13 @@ if __name__ == '__main__':
             content=report,
             summary="答题报告",
             content_type=1,
-            spt="SPT_2CH4KczNN6QwbzkVo4a1T05TX0f6"  # 替换为实际的SPT
+            spt="******"  # 替换为实际的SPT
         )
     else:
         send_message(
             content=message,
             summary="运行失败",
             content_type=1,
-            spt="SPT_2CH4KczNN6QwbzkVo4a1T05TX0f6"  # 替换为实际的SPT
+            spt="******"  # 替换为实际的SPT
         )
     db.close()
